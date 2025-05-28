@@ -1,0 +1,7 @@
+<h1>Actividades</h1>
+<ul>
+  {% for actividad in actividades %}
+    <li>{{ actividad.nombre }}</li>
+  {% endfor %}
+</ul>
+<a href="/nueva">Nueva actividad</a>

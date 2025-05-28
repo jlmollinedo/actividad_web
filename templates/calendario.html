@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}Calendario de Actividades{% endblock %}
+
+{% block content %}
+<h1 class="text-center text-primary mb-4">Calendario de Actividades</h1>
+
+{% if session.get('rol') == 'profesor' %}
+<div class="d-flex justify-content-end mb-3">
+  <a href="{{ url_for('logout') }}" class="btn btn-outline-danger ms-2">Cerrar sesión</a>
+</div>
+{% else %}
+<div class="d-flex justify-content-end mb-3">
+  <a href="{{ url_for('login') }}" class="btn btn-primary">
+    Iniciar sesión como profesor
+  </a>
+</div>
+{% endif %}
+<style>
+  /* Estilo de hover más claro para eventos del calendario */
+  .fc-event:hover {
+    background-color: #d6eaff !important;  /* Azul claro */
+    border-color: #8bc3ff !important;
+    cursor: pointer;
+    border-radius: 6px;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+    color: #000;
+  }
+</style>
+
+<div id="calendar" class="shadow border rounded p-2 bg-white" data-rol="{{ session.get('rol') }}"></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/calendar.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Detalle de la Actividad</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 2rem;
+    color: #212529;
+    background-color: #f9f9f9;
+  }
+  h1 {
+    color: #0d6efd;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .detalle {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(13, 110, 253, 0.2);
+  }
+  .campo {
+    margin-bottom: 1rem;
+  }
+  .campo strong {
+    color: #0d6efd;
+  }
+  .participantes {
+    margin-top: 1.5rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+  }
+  th, td {
+    padding: 0.75rem;
+    border: 1px solid #dee2e6;
+    text-align: left;
+  }
+  th {
+    background-color: #0d6efd;
+    color: white;
+  }
+</style>
+</head>
+<body>
+  <h1>Detalle de la Actividad</h1>
+  <div class="detalle">
+    <div class="campo"><strong>Nombre:</strong> {{ actividad.nombre }}</div>
+    <div class="campo"><strong>Fecha:</strong> {{ actividad.fecha }}</div>
+    <div class="campo"><strong>Hora inicio:</strong> {{ actividad.hora_inicio }}</div>
+    <div class="campo"><strong>Hora fin:</strong> {{ actividad.hora_fin }}</div>
+    <div class="campo"><strong>Descripción:</strong> {{ actividad.descripcion }}</div>
+    
+    {% if participantes %}
+    <div class="participantes">
+      <strong>Participantes:</strong>
+      <table>
+        <thead>
+          <tr><th>Nombre</th><th>Participa</th></tr>
+        </thead>
+        <tbody>
+          {% for p in participantes %}
+          <tr>
+            <td>{{ p.nombre }}</td>
+            <td>{{ 'Sí' if p.participa else 'No' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+  </div>
+</body>
+</html>

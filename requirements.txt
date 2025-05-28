@@ -1,0 +1,10 @@
+flask
+flask_sqlalchemy
+flask_mail
+weasyprint
+Flask==2.3.3
+flask_login
+PyMySQL
+fpdf
+python-dateutil
+pytz

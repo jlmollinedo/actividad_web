@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Actividades</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #aaa;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Actividades</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Fecha</th>
+                <th>Hora de Inicio</th>
+                <th>Hora de Fin</th>
+                <th>Departamentos</th>
+                <th>Alumnos</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for actividad in actividades %}
+            <tr>
+                <td>{{ actividad.nombre }}</td>
+                <td>{{ actividad.fecha.strftime('%Y-%m-%d') }}</td>
+                <td>{{ actividad.hora_inicio.strftime('%H:%M') }}</td>
+                <td>{{ actividad.hora_fin.strftime('%H:%M') }}</td>
+                <td>
+                    {% for depto in actividad.departamentos %}
+                        {{ depto.nombre }}{% if not loop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>
+                    <ul>
+                        {% for participacion in actividad.participantes %}
+                            <li>{{ participacion.alumno.nombre }}</li>
+                        {% else %}
+                            <li>No hay alumnos asignados</li>
+                        {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6">No hay actividades registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

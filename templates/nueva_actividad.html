@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Nueva Actividad{% endblock %}
+
+{% block content %}
+    <h1>Nueva Actividad</h1>
+    <form method="post">
+        <label>Nombre:</label>
+        <input type="text" name="nombre" required><br>
+
+        <label>Descripción:</label>
+        <textarea name="descripcion" required></textarea><br>
+
+        <label>Fecha:</label>
+        <input type="date" name="fecha" required
+               value="{{ fecha.isoformat() if fecha else '' }}"><br>
+
+        <label>Hora de Inicio:</label>
+        <input type="time" name="hora_inicio" required><br>
+
+        <label>Hora de Fin:</label>
+        <input type="time" name="hora_fin" required><br>
+
+        <label>Departamento:</label>
+        <select name="departamento" required>
+            {% for depto in departamentos %}
+                <option value="{{ depto.id }}">{{ depto.nombre }}</option>
+            {% endfor %}
+        </select><br>
+
+        <button type="submit">Guardar</button>
+    </form>
+{% endblock %}

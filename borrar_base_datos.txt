@@ -1,0 +1,28 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+DELETE FROM actividad_alumnado;
+DELETE FROM actividad_departamento;
+DELETE FROM actividad_grupo;
+DELETE FROM actividad_profesorado;
+DELETE FROM participaciones;
+
+DELETE FROM actividades;
+DELETE FROM grupos;  -- borrar grupos antes que cursos
+DELETE FROM cursos;
+DELETE FROM alumnos;
+DELETE FROM departamentos;
+DELETE FROM profesorado;
+
+ALTER TABLE actividad_alumnado AUTO_INCREMENT = 1;
+ALTER TABLE actividad_departamento AUTO_INCREMENT = 1;
+ALTER TABLE actividad_grupo AUTO_INCREMENT = 1;
+ALTER TABLE actividad_profesorado AUTO_INCREMENT = 1;
+ALTER TABLE participaciones AUTO_INCREMENT = 1;
+ALTER TABLE actividades AUTO_INCREMENT = 1;
+ALTER TABLE grupos AUTO_INCREMENT = 1;
+ALTER TABLE cursos AUTO_INCREMENT = 1;
+ALTER TABLE alumnos AUTO_INCREMENT = 1;
+ALTER TABLE departamentos AUTO_INCREMENT = 1;
+ALTER TABLE profesorado AUTO_INCREMENT = 1;
+
+SET FOREIGN_KEY_CHECKS = 1;

@@ -1,0 +1,255 @@
+{% extends "base.html" %}
+
+{% block title %}
+  {% if actividad %}Editar actividad{% else %}Nueva actividad{% endif %}
+{% endblock %}
+
+{% block content %}
+<h2 class="mb-4">{% if actividad %}Editar actividad{% else %}Nueva actividad{% endif %}</h2>
+
+<form method="POST" action="" id="form-actividad">
+  <div class="mb-3">
+    <label for="nombre" class="form-label">Nombre</label>
+    <input type="text" id="nombre" name="nombre" class="form-control" required
+           value="{{ actividad.nombre if actividad else '' }}">
+  </div>
+
+  <div class="mb-3">
+    <label for="descripcion" class="form-label">Descripción</label>
+    <textarea id="descripcion" name="descripcion" class="form-control">{{ actividad.descripcion if actividad else '' }}</textarea>
+  </div>
+
+  <div class="mb-3">
+    <label for="observaciones" class="form-label">Observaciones</label>
+    <textarea id="observaciones" name="observaciones" class="form-control">{{ actividad.observaciones if actividad else '' }}</textarea>
+  </div>
+
+  <div class="mb-3">
+    <label for="fecha" class="form-label">Fecha</label>
+    <input type="date" id="fecha" name="fecha" class="form-control" required
+           value="{{ fecha.strftime('%Y-%m-%d') if fecha else '' }}">
+  </div>
+
+  <div class="mb-3">
+    <label for="hora_inicio" class="form-label">Hora inicio</label>
+    <input type="time" id="hora_inicio" name="hora_inicio" class="form-control" required
+           value="{{ hora_inicio_str }}">
+  </div>
+
+  <div class="mb-3">
+    <label for="hora_fin" class="form-label">Hora fin</label>
+    <input type="time" id="hora_fin" name="hora_fin" class="form-control" required
+           value="{{ hora_fin_str }}">
+  </div>
+
+  <div class="mb-4">
+    <label for="departamentos" class="form-label">Departamentos responsables</label>
+    <select multiple class="form-select" id="departamentos" name="departamentos_ids[]">
+      {% for departamento in departamentos %}
+        <option value="{{ departamento.id }}" {% if departamento.id in departamentos_ids_seleccionados %}selected{% endif %}>
+          {{ departamento.nombre }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+<div class="mb-4">
+  <label class="form-label">Profesorado responsable</label>
+  <div id="profesores-container" class="row row-cols-1 row-cols-md-3 g-2">
+    {% for profesor in profesorado %}
+      {% if profesor.departamento_id in departamentos_ids_seleccionados %}
+        <div class="form-check col profesor-item departamento-{{ profesor.departamento_id }}">
+          <input class="form-check-input" type="checkbox" name="profesores_ids[]" value="{{ profesor.id }}"
+                 id="profesor{{ profesor.id }}"
+                 {% if profesor.id in profesores_ids_seleccionados %}checked{% endif %}>
+          <label class="form-check-label" for="profesor{{ profesor.id }}">
+            {{ profesor.nombre }} {{ profesor.apellido }}
+          </label>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+  <div class="mb-4">
+    <label for="grupos" class="form-label">Grupos participantes</label>
+    <select multiple class="form-select" id="grupos" name="grupos[]">
+      {% for grupo in grupos %}
+        <option value="{{ grupo.id }}" {% if grupo.id in grupos_seleccionados %}selected{% endif %}>
+          {{ grupo.curso.nombre }} {{ grupo.nombre }}
+        </option>
+      {% endfor %}
+    </select>
+    <small class="form-text text-muted mt-1">
+      Mantén pulsada la tecla CTRL (o Cmd en Mac) para seleccionar varios grupos.
+    </small>
+  </div>
+
+  <div class="mb-4">
+    <label class="form-label">Alumnado participante (marque asistencia)</label>
+
+    <div class="form-check mb-2">
+      <input type="checkbox" class="form-check-input" id="seleccionar-todos-alumnos">
+      <label class="form-check-label" for="seleccionar-todos-alumnos">
+        Seleccionar todos los alumnos
+      </label>
+    </div>
+
+    <div id="alumnos-container" class="row row-cols-1 row-cols-md-3 g-2">
+      {% for alumno in alumnos %}
+        <div class="form-check col alumno-item grupo-{{ alumno.grupo_id }}">
+          <input class="form-check-input checkbox-alumno" type="checkbox" name="alumnos_participantes[]" value="{{ alumno.id }}"
+                 id="alumno{{ alumno.id }}"
+                 {% if alumno.id in alumnos_participantes_ids %}checked{% endif %}>
+          <label class="form-check-label" for="alumno{{ alumno.id }}">
+            {{ alumno.nombre }} {{ alumno.apellido }}
+          </label>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div></div>
+</form>
+
+<div class="botones-container" style="display: flex; align-items: center; justify-content: space-between; position: relative; margin-top: 1rem;">
+  <div>
+    <button type="submit" form="form-actividad" class="btn btn-primary" style="width: 140px;">
+      Guardar
+    </button>
+  </div>
+
+  {% if actividad %}
+  <form id="form-eliminar" action="{{ url_for('eliminar_actividad', id=actividad.id) }}" method="POST"
+        onsubmit="return confirm('¿Seguro que quieres eliminar esta actividad?');"
+        style="position: absolute; left: 50%; transform: translateX(-50%);">
+    <button type="submit" class="btn btn-danger eliminar-btn d-flex align-items-center justify-content-center" style="width: 140px;">
+      <span class="icon-trash" aria-hidden="true"></span>
+      Eliminar
+    </button>
+  </form>
+  {% endif %}
+
+  <div style="margin-left: auto;">
+    <a href="{{ url_for('calendario') }}" class="btn btn-secondary" style="width: 140px;">
+      Cancelar
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const selectDepartamentos = document.getElementById('departamentos');
+    const profesoresContainer = document.getElementById('profesores-container');
+    const selectGrupos = document.getElementById('grupos');
+    const alumnosContainer = document.getElementById('alumnos-container');
+    const alumnos = Array.from(alumnosContainer.querySelectorAll('.alumno-item'));
+    const seleccionarTodosAlumnosCheckbox = document.getElementById('seleccionar-todos-alumnos');
+
+    // IDs de profesores seleccionados al cargar (para departamentos)
+    const profesores_ids_seleccionados = {{ profesores_ids_seleccionados | default([]) | tojson }};
+
+    // Función para actualizar lista de profesores según departamentos seleccionados
+    function actualizarProfesores() {
+      const departamentosSeleccionados = Array.from(selectDepartamentos.selectedOptions).map(opt => opt.value);
+      fetch('/profesorado_por_departamento', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ departamento_ids: departamentosSeleccionados }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        profesoresContainer.innerHTML = '';
+        const seleccionadosSet = new Set(profesores_ids_seleccionados.map(id => Number(id)));
+        data.forEach(profesor => {
+          const div = document.createElement('div');
+          div.className = 'form-check col profesor-item departamento-' + profesor.departamento_id;
+          const input = document.createElement('input');
+          input.type = 'checkbox';
+          input.className = 'form-check-input';
+          input.name = 'profesores_ids[]';
+          input.value = profesor.id;
+          input.id = 'profesor' + profesor.id;
+          if (seleccionadosSet.has(Number(profesor.id))) input.checked = true;
+          const label = document.createElement('label');
+          label.className = 'form-check-label';
+          label.setAttribute('for', input.id);
+          label.textContent = profesor.nombre_completo;
+          div.appendChild(input);
+          div.appendChild(label);
+          profesoresContainer.appendChild(div);
+        });
+      });
+    }
+
+    // Filtra los alumnos según los grupos seleccionados
+    function filtrarAlumnos() {
+      const gruposSeleccionados = Array.from(selectGrupos.selectedOptions).map(opt => opt.value);
+      if (gruposSeleccionados.length === 0) {
+        // Ocultar todos los alumnos si no hay grupos seleccionados
+        alumnos.forEach(alumno => {
+          alumno.style.display = 'none';
+          alumno.querySelector('input[type="checkbox"]').checked = false;
+        });
+        seleccionarTodosAlumnosCheckbox.checked = false;
+      } else {
+        // Mostrar solo alumnos que pertenezcan a grupos seleccionados
+        alumnos.forEach(alumno => {
+          const grupoIdMatch = alumno.className.match(/grupo-(\d+)/);
+          if (grupoIdMatch) {
+            const idGrupo = grupoIdMatch[1];
+            if (gruposSeleccionados.includes(idGrupo)) {
+              alumno.style.display = '';
+            } else {
+              alumno.style.display = 'none';
+              alumno.querySelector('input[type="checkbox"]').checked = false;
+            }
+          }
+        });
+      }
+    }
+
+    // Evento para seleccionar/deseleccionar todos los alumnos visibles
+    seleccionarTodosAlumnosCheckbox.addEventListener('change', function () {
+      const visibleAlumnos = alumnos.filter(a => a.style.display !== 'none');
+      visibleAlumnos.forEach(alumno => {
+        alumno.querySelector('input[type="checkbox"]').checked = seleccionarTodosAlumnosCheckbox.checked;
+      });
+    });
+
+    // Actualiza profesores cuando cambien departamentos
+    selectDepartamentos.addEventListener('change', actualizarProfesores);
+
+    // Actualiza alumnos cuando cambien grupos
+    selectGrupos.addEventListener('change', filtrarAlumnos);
+
+    // Al cargar la página, inicializa profesores y alumnos
+    if (selectDepartamentos.selectedOptions.length > 0) {
+      actualizarProfesores();
+    }
+    filtrarAlumnos();  // Oculta alumnos si no hay grupos seleccionados al cargar
+  });
+</script>
+
+
+<style>
+  .eliminar-btn {
+    position: relative;
+    padding-left: 2.5rem;
+    font-weight: 600;
+  }
+
+  .eliminar-btn .icon-trash {
+    position: absolute;
+    left: 0.8rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6zm2 3h2v9H5v-9zm4 0h2v9H9v-9zm4 0h2v9h-2v-9zm4-3v2h-2V6h2z"/></svg>');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+  }
+</style>
+{% endblock %}
